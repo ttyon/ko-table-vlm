@@ -1,0 +1,55 @@
+# 운영체제
+.DS_Store
+
+# Python 환경과 빌드 결과
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# 로컬 설정과 키
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# 로컬 데이터와 실험 산출물
+/data/raw/
+/data/private/
+/models/
+/adapters/
+/checkpoints/
+/artifacts/
+/logs/
+/runs/
+*.safetensors
+*.gguf
+*.ckpt
+*.pt
+*.pth
+
+# 생성 데이터 (재생성 가능, 대용량)
+/data/generated/
+/adapters/
+
+# 실제 문서에서 잘라낸 표 이미지 (라이선스 확인 전 비공개)
+/data/real/*
+!/data/real/.gitkeep
+!/data/real/SOURCES.md
+
+# 내려받은 폰트 (scripts/download_fonts.sh 로 재생성)
+/fonts/
+# 실험 결과 원본
+/runs/
+
+# 재생성 가능한 중간 산출물 (학습용 jsonl에는 로컬 절대경로가 들어감)
+/data/sft/
+/data/res/
