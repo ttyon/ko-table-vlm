@@ -53,3 +53,9 @@ dist/
 # 재생성 가능한 중간 산출물 (학습용 jsonl에는 로컬 절대경로가 들어감)
 /data/sft/
 /data/res/
+
+# 두 번째 실제 문서 세트 (다른 기관) — 정답 라벨·이미지·PDF는 올리지 않음
+/data/real2/*
+!/data/real2/.gitkeep
+!/data/real2/SOURCES.md
+/data/scan/

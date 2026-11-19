@@ -18,4 +18,7 @@
 | 011 | [LoRA rank / 모델 크기](011_exp-rank-and-model-size.md) | 3 | r16 유지, 4B는 이득 없음, 평균은 드문 붕괴가 좌우 |
 | 012 | [종합 결론](012_summary.md) | — | 실제 문서 0.773(Docling)→0.956(2B 최종), 27B 0.985, 교훈 5가지 |
 
+| 013 | [데이터셋·학습 방법 정리](013_data-and-training-card.md) | — | 학습·평가 데이터 구성, LoRA 설정, 체크포인트 선택, 추론 설정 한 곳에 |
+| 014 | [다른 기관 문서·스캔 모사 평가](014_eval-other-institutions.md) | 4 | **일반화 실패 확인**: 다른 기관 0.805(학습 전 0.900보다 낮음), 원인은 긴 표·목록형 표 부재. 스캔 품질에선 VLM이 Docling을 압도 |
+
 참고: [개념 정리](concepts.md) (TEDS, OTSL, 합성→실제 격차) · [주제 선정](topic-candidates.md)

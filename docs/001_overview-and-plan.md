@@ -37,10 +37,12 @@
 | 2 | LoRA SFT (HTML, r16) | [006](006_lora-html-r16.md) |
 | 2 | 실패 사례 분류 | [007](007_failure-analysis.md) |
 | 3 | 출력 형식 (HTML vs OTSL) | [008](008_exp-output-format.md) |
-| 3 | 데이터 보강 | 009 (진행 예정) |
-| 3 | 해상도 | 010 (진행 예정) |
-| 3 | LoRA rank / 모델 크기 | 011 (진행 예정) |
-| — | 종합 결론 | 012 (마지막) |
+| 3 | 데이터 보강·혼합·체크포인트 선택 | [009](009_exp-data-augmentation.md) |
+| 3 | 해상도 | [010](010_exp-resolution.md) |
+| 3 | LoRA rank / 모델 크기 | [011](011_exp-rank-and-model-size.md) |
+| — | 종합 결론 (1~3주차) | [012](012_summary.md) |
+| — | 데이터셋·학습 방법 정리 | [013](013_data-and-training-card.md) |
+| 4 | 다른 기관 문서·스캔 모사 일반화 평가 | [014](014_eval-other-institutions.md) |
 
 ## 환경
-Mac Studio M5 Max 64GB · mlx-vlm 0.7.11 · Python 3.12 (uv) · Docling (TableFormer ACCURATE + macOS Vision OCR) · 모든 결과 원본은 `runs/`(gitignore)
+Mac Studio M5 Max 64GB · mlx-vlm 0.8.0 / mlx 0.32.4 (이 프로젝트: 2B 학습·서빙), mlx-vlm 0.7.11 (`llm-serving`: 27B 서빙) · Python 3.12 (uv) · Docling (TableFormer ACCURATE + macOS Vision OCR) · 모든 결과 원본은 `runs/`(gitignore)

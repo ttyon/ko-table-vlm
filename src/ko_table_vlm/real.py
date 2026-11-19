@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from PIL import Image
@@ -27,7 +28,10 @@ from PIL import Image
 from .table import normalize_html, parse_table, to_grid
 
 ROOT = Path(__file__).resolve().parents[2]
-REAL = ROOT / "data" / "real"
+# 여러 실제 문서 세트를 분리 관리: REAL_DIR=data/real2 uv run python -m ko_table_vlm.real ...
+REAL = Path(os.environ.get("REAL_DIR", ROOT / "data" / "real"))
+if not REAL.is_absolute():
+    REAL = ROOT / REAL
 DRAFT_MARK = "<!-- DRAFT -->"
 
 
@@ -55,6 +59,8 @@ def cmd_subset(n_pages: int, seed: int, pattern: str):
         pdf.rename(src)
         doc = pdfium.PdfDocument(str(src))
         cands = [i for i in range(len(doc)) if pattern in doc[i].get_textpage().get_text_range()]
+        if not cands:  # 표 표시 문구가 없는 짧은 문서는 전체 페이지 사용
+            cands = list(range(len(doc)))
         picked = sorted(random.Random(seed).sample(cands, min(n_pages, len(cands))))
         out = pdfium.PdfDocument.new()
         out.import_pages(doc, picked)
