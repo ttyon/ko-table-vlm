@@ -61,7 +61,11 @@ class ApiBackend:
             body["chat_template_kwargs"] = {"enable_thinking": False}
         if self.repetition_penalty:
             body["repetition_penalty"] = self.repetition_penalty
-        r = self.client.post(self.url, json=body)
+        for attempt in range(6):  # 서버 모델 로딩 중(503)이면 기다렸다 재시도
+            r = self.client.post(self.url, json=body)
+            if r.status_code != 503:
+                break
+            time.sleep(10 * (attempt + 1))
         r.raise_for_status()
         j = r.json()
         return {"output": j["choices"][0]["message"].get("content") or "",
@@ -134,7 +138,8 @@ def main():
         keep = set(args.ids.split(","))
         rows = [r for r in rows if r["id"] in keep]
     pred_path = run / "predictions.jsonl"
-    done = {p["id"] for p in load_jsonl(pred_path)}
+    # 오류(error: …)로 끝난 기록은 '안 한 것'으로 보고 다시 실행한다 (나중 줄이 앞 줄을 덮어씀)
+    done = {p["id"] for p in load_jsonl(pred_path) if not str(p.get("finish_reason", "")).startswith("error")}
     todo = [r for r in rows if r["id"] not in done]
 
     fmt = "html" if args.backend == "docling" else args.format

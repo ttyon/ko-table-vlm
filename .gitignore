@@ -59,3 +59,10 @@ dist/
 !/data/real2/.gitkeep
 !/data/real2/SOURCES.md
 /data/scan/
+
+# 세 번째 실제 문서 세트 (블라인드 최종 평가) — 정답·이미지·PDF 비공개
+/data/real3/*
+!/data/real3/.gitkeep
+!/data/real3/SOURCES.md
+# 증류 풀 (27B 가짜 정답) — 원본 비공개
+/data/distill/
