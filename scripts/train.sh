@@ -15,10 +15,12 @@ RANK="${RANK:-16}"
 ALPHA="${ALPHA:-$((RANK * 2))}"
 LR="${LR:-1e-4}"
 ITERS="${ITERS:-3000}"          # train 3000줄 × batch 1 → 약 1 epoch
+MAXSEQ="${MAXSEQ:-6144}"        # mlx_vlm 기본 2048은 긴 표의 끝을 잘라 학습함 (015) — 이전 학습(006~011)은 2048
+EXTRA=(${=EXTRA:-})             # 추가 인자 (예: EXTRA="--seed 1 --lr-schedule cosine_decay --warmup-steps 100")
 BATCH="${BATCH:-1}"
 
 mkdir -p runs adapters
-echo "model=$MODEL data=$DATA rank=$RANK alpha=$ALPHA lr=$LR iters=$ITERS" | tee "runs/train_${NAME}.log"
+echo "model=$MODEL data=$DATA rank=$RANK alpha=$ALPHA lr=$LR iters=$ITERS maxseq=$MAXSEQ extra=$EXTRA" | tee "runs/train_${NAME}.log"
 # --train-on-completions : 질문(이미지+프롬프트) 부분은 loss에서 빼고 정답 HTML만 학습
 # --grad-checkpoint      : 긴 출력(표 HTML) 때문에 메모리 절약
 uv run python -m mlx_vlm.train \
@@ -28,5 +30,6 @@ uv run python -m mlx_vlm.train \
   --batch-size "$BATCH" --iters "$ITERS" \
   --train-on-completions --grad-checkpoint \
   --steps-per-report 20 --steps-per-eval 250 --val-batches 25 --steps-per-save 500 \
+  --max-seq-length "$MAXSEQ" $EXTRA \
   --output-path "adapters/$NAME" \
   2>&1 | tee -a "runs/train_${NAME}.log"

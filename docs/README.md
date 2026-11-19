@@ -20,5 +20,6 @@
 
 | 013 | [데이터셋·학습 방법 정리](013_data-and-training-card.md) | — | 학습·평가 데이터 구성, LoRA 설정, 체크포인트 선택, 추론 설정 한 곳에 |
 | 014 | [다른 기관 문서·스캔 모사 평가](014_eval-other-institutions.md) | 4 | **일반화 실패 확인**: 다른 기관 0.805(학습 전 0.900보다 낮음), 원인은 긴 표·목록형 표 부재. 스캔 품질에선 VLM이 Docling을 압도 |
+| 015 | [4주차 계획 사전 등록](015_plan-v3-and-distillation.md) | 4 | test-real-3 만들기 전 고정한 실험·필터·선택·성공 기준. max_seq_length 2048 잘림 발견 |
 
 참고: [개념 정리](concepts.md) (TEDS, OTSL, 합성→실제 격차) · [주제 선정](topic-candidates.md)
