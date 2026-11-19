@@ -39,11 +39,15 @@ class Placed:
     kind: str = "text"
 
 
-def make_structure(rng: random.Random, max_rows: int = 16, max_cols: int = 9, template_p: float = 0.0):
+def make_structure(rng: random.Random, max_rows: int = 16, max_cols: int = 9, template_p: float = 0.0,
+                   v3_p: float = 0.0, v3_max_rows: int = 40):
     """격자 위에 셀을 배치한다. 반환: (Placed 목록, 헤더 행 수, stub 열 수).
     모든 행에 그 행에서 시작하는 셀이 최소 1개 있어야 HTML로 표현 가능 → 아니면 다시 생성."""
     while True:
-        if template_p and rng.random() < template_p:
+        if v3_p and rng.random() < v3_p:
+            from .gen_v3 import v3_structure
+            placed, h, s = v3_structure(rng, v3_max_rows)
+        elif template_p and rng.random() < template_p:
             placed, h, s = _template_structure(rng, max_rows)
         else:
             placed, h, s = _make_structure(rng, max_rows, max_cols)
@@ -272,15 +276,23 @@ def render_html(placed: list[Placed]) -> str:
         cls_tr = ' class="z"' if i % 2 == 0 else ""
         out.append(f"<tr{cls_tr}>")
         for p in sorted(rows[r], key=lambda x: x.c):
-            cls = "h" if p.role == "header" else ("t" if p.kind == "text" or p.role in ("stub", "total") else "n")
+            cls = "h" if p.role == "header" else ("t" if p.kind == "text" or p.role in ("stub", "total", "ls", "indent") else "n")
             if p.role == "total":
                 cls += " h"
+            elif p.role == "ls":
+                cls += " ls"
+            elif p.role == "indent":
+                cls += " ind"
             attrs = (f' rowspan="{p.rs}"' if p.rs > 1 else "") + (f' colspan="{p.cs}"' if p.cs > 1 else "")
             txt = "<br>".join(html_lib.escape(x) for x in p.text.split("\n"))
+            txt = _FOOT.sub(r"<sup>\1</sup>", txt)   # 각주 표시 "… 2)" 는 위첨자로 렌더링 (정답은 " 2)")
             out.append(f'<td class="{cls}"{attrs}>{txt}</td>')
         out.append("</tr>")
     out.append("</table>")
     return "".join(out)
+
+
+_FOOT = __import__("re").compile(r" (\d\))$")
 
 
 def base_page() -> str:
@@ -349,6 +361,8 @@ def main():
     ap.add_argument("--max-cols", type=int, default=9)
     ap.add_argument("--aug", action="store_true", help="데이터 보강(009): 실제 공문서 헤더 템플릿·스타일 추가")
     ap.add_argument("--template-p", type=float, default=0.5, help="--aug 일 때 템플릿 구조 비율")
+    ap.add_argument("--v3", action="store_true", help="생성기 v3(015): 긴 표·목록형·L자 헤더·자간 라벨 등 축 추가")
+    ap.add_argument("--v3-p", type=float, default=0.5, help="--v3 일 때 v3 구조 비율 (나머지는 원본/보강 구조)")
     args = ap.parse_args()
 
     if not any(FONT_DIR.glob("*.ttf")):
@@ -363,7 +377,8 @@ def main():
         browser = pw.chromium.launch()
         pages = {}
         for i in range(args.n):
-            st = sample_style(rng, args.split, aug=args.aug)
+            is_v3 = args.v3 and rng.random() < args.v3_p
+            st = sample_style(rng, args.split, aug=args.aug, v3=is_v3)
             if st.scale not in pages:
                 ctx = browser.new_context(viewport={"width": 2000, "height": 1400}, device_scale_factor=st.scale)
                 pg = ctx.new_page()
@@ -372,7 +387,8 @@ def main():
                 pg.goto(base.as_uri())
                 pages[st.scale] = pg
             pg = pages[st.scale]
-            placed, h, s = make_structure(rng, args.max_rows, args.max_cols, args.template_p if args.aug else 0.0)
+            placed, h, s = make_structure(rng, args.max_rows, args.max_cols, args.template_p if args.aug else 0.0,
+                                          v3_p=1.0 if is_v3 else 0.0)
             table = to_table(placed)
             pg.evaluate("""([css, html, pad]) => {
                 document.getElementById('st').textContent = css;
@@ -390,7 +406,7 @@ def main():
             img.save(out / "images" / f"{sid}.png")
             cells, n_rows, n_cols, ok = to_grid(table)
             assert ok, f"생성 버그: 격자 불일치 {sid}"
-            meta = {"aug": args.aug, "rows": n_rows, "cols": n_cols, "header_rows": h, "stub_cols": s,
+            meta = {"aug": args.aug, "v3": bool(is_v3), "rows": n_rows, "cols": n_cols, "header_rows": h, "stub_cols": s,
                     "n_spans": sum(c.rowspan > 1 or c.colspan > 1 for c in cells),
                     "tags": tags_for(table, h, st), "style": st.to_dict(), "degrade": ops,
                     "width": img.size[0], "height": img.size[1]}

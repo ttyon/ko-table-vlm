@@ -41,13 +41,25 @@ class Style:
     text_max_width: int  # 텍스트 열 최대 폭(px) → 자연스러운 줄바꿈 유도, 0이면 제한 없음
     scale: float         # 렌더링 배율 (해상도 다양화)
     break_all: bool = False  # 좁은 텍스트 열에서 단어 중간 줄바꿈 (실제 문서 패턴)
+    ls_em: float = 0.0       # v3: 자간 라벨(role ls)의 letter-spacing (em) — 정답은 붙여 씀
 
     def to_dict(self):
         return asdict(self)
 
 
-def sample_style(rng: random.Random, split: str, aug: bool = False) -> Style:
+V3_BORDERS = ["no_vertical", "no_vertical", "dotted_v", "horizontal", "full"]
+
+
+def sample_style(rng: random.Random, split: str, aug: bool = False, v3: bool = False) -> Style:
     key = "ood" if split == "ood" else "train"
+    if v3 and key == "train":
+        return Style(
+            font=rng.choice(FONTS["train"]), font_size=rng.randint(11, 16),
+            border=rng.choice(V3_BORDERS), header_bg=rng.choice(HEADER_BG["train"] + AUG_EXTRA["header_bg"] + ["none", "none"]),
+            header_bold=rng.random() < 0.4, padding=rng.randint(2, 7),
+            num_align=rng.choice(["right", "right", "center"]), zebra=rng.random() < 0.1,
+            text_max_width=rng.choice([0, 160, 220, 320]), scale=rng.choice([1.0, 1.25, 1.5]),
+            break_all=rng.random() < 0.3, ls_em=rng.uniform(0.3, 1.2))
     if aug and key == "train":
         st = Style(
             font=rng.choice(FONTS["train"]), font_size=rng.randint(12, 17),
@@ -84,6 +96,9 @@ def css(st: Style) -> str:
     td.n {{ text-align:{st.num_align}; }}
     td.t {{ text-align:left; {f'max-width:{st.text_max_width}px;' if st.text_max_width else ''} {'word-break:break-all;' if st.break_all else ''} }}
     {'tr.z td:not(.h) { background:#f7f7f7; }' if st.zebra else ''}
+    td.ls {{ letter-spacing:{st.ls_em:.2f}em; text-align:center; }}
+    td.ind {{ padding-left:{st.padding + 18}px; }}
+    sup {{ font-size:0.65em; }}
     """
     b = {
         "full": "td { border:1px solid #444; }",
@@ -94,6 +109,10 @@ def css(st: Style) -> str:
         "none_shaded": "td { border:none; } td.h { border-bottom:1px solid #999; }",
         "dashed": "td { border:1px dashed #666; }",
         "double_outer": "table { border:3px double #222; } td { border:1px solid #888; }",
+        "no_vertical": "table { border-top:2px solid #222; border-bottom:2px solid #222; }"
+                       " td.h { border-bottom:1px solid #444; } td { border:none; }",
+        "dotted_v": "table { border-top:2px solid #222; border-bottom:2px solid #222; }"
+                    " td { border-left:1px dotted #999; } td.h { border-bottom:1px solid #444; }",
         "dotted_rows": "table { border-top:2px solid #333; border-bottom:2px solid #333; }"
                        " td { border-bottom:1px dotted #999; border-right:1px solid #ccc; } td.h { border-bottom:1px solid #666; }",
     }[st.border]
