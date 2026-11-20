@@ -22,4 +22,9 @@
 | 014 | [다른 기관 문서·스캔 모사 평가](014_eval-other-institutions.md) | 4 | **일반화 실패 확인**: 다른 기관 0.805(학습 전 0.900보다 낮음), 원인은 긴 표·목록형 표 부재. 스캔 품질에선 VLM이 Docling을 압도 |
 | 015 | [4주차 계획 사전 등록](015_plan-v3-and-distillation.md) | 4 | test-real-3 만들기 전 고정한 실험·필터·선택·성공 기준. max_seq_length 2048 잘림 발견 |
 
+| 016 | [4주차 데이터 준비](016_week4-data-preparation.md) | 4 | 블라인드 test-real-3(관세청·재정경제부 13표), 27B 증류 224표, 생성기 v3, 계획 대비 변경 |
+| 017 | [A0: 시퀀스 길이 제한만 수정](017_exp-a0-max-seq-length.md) | 4 | 2048 잘림 수정만으로는 반복 붕괴 그대로 → 데이터가 핵심 |
+| 018 | [B·C: v3 데이터 + 27B 증류](018_exp-b-c-v3-and-distillation.md) | 4 | 다른 기관 0.805→0.93, 반복 붕괴 제거, 증류는 같은 기관에 주로 효과 |
+| 019 | [블라인드 최종 평가와 결론](019_final-blind-eval-and-conclusion.md) | 4 | test-real-3에서 학습 전 2B(0.982)를 못 넘음(0.975) — 어휘 편향(억불→억원) 발견 |
+
 참고: [개념 정리](concepts.md) (TEDS, OTSL, 합성→실제 격차) · [주제 선정](topic-candidates.md)
